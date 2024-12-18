@@ -10,10 +10,12 @@ namespace TaskManagerAPI.Controllers
     public class ProjectsController : ControllerBase
     {
         private readonly IProjectService _projectService;
+        private readonly ITaskService _taskService;
 
-        public ProjectsController(IProjectService projectService)
+        public ProjectsController(IProjectService projectService, ITaskService taskService)
         {
             _projectService = projectService;
+            _taskService = taskService;
         }
 
         [HttpGet]
@@ -33,6 +35,21 @@ namespace TaskManagerAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProject(string id)
         {
+            // Verificar se o projeto existe
+            var project = await _projectService.GetProjectAsync(id);
+            if (project == null)
+            {
+                return NotFound("Projeto não encontrado.");
+            }
+
+            // Verificar se há tarefas pendentes associadas ao projeto
+            var tasks = await _taskService.GetTasksAsync(id);
+            if (tasks.Exists(t => t.Status != EnumStatus.DONE))
+            {
+                return BadRequest("O projeto não pode ser removido, pois há tarefas pendentes ou em andamento. Conclua ou remova as tarefas antes de excluir o projeto.");
+            }
+
+            // Remover o projeto
             await _projectService.DeleteProjectAsync(id);
             return NoContent();
         }

@@ -11,11 +11,11 @@ EXPOSE 8081
 # Esta fase é usada para compilar o projeto de serviço
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["TaskManagerAPI.csproj", "."]
+WORKDIR /TaskManagerAPI
+COPY ["TaskManagerAPI/TaskManagerAPI.csproj", "."]
 RUN dotnet restore "./TaskManagerAPI.csproj"
 COPY . .
-WORKDIR "/src/."
+WORKDIR TaskManagerAPI
 RUN dotnet build "./TaskManagerAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # Esta fase é usada para publicar o projeto de serviço a ser copiado para a fase final

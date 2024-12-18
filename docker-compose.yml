@@ -1,0 +1,38 @@
+﻿version: '3.8'
+
+services:
+  # Serviço da aplicação .NET
+  taskmanagerapi:
+    build:
+      context: .
+      dockerfile: ./TaskManagerAPI/Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      - mongo
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MONGODB_CONNECTIONSTRING=mongodb://mongo:27017
+    networks:
+      - taskmanager-network
+
+  # Serviço do MongoDB
+  mongo:
+    image: mongo:6.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - taskmanager-network
+
+# Definindo as redes e volumes
+networks:
+  taskmanager-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local

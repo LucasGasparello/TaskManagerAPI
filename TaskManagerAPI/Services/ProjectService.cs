@@ -10,12 +10,11 @@ namespace TaskManagerAPI.Services
     {
         private readonly IMongoCollection<Project> _projects;
 
-        public ProjectService(IOptions<MongoDbSettings> mongoDbSettings)
+        public ProjectService(IMongoCollection<Project> projects)
         {
-            var client = new MongoClient(mongoDbSettings.Value.ConnectionString);
-            var database = client.GetDatabase(mongoDbSettings.Value.DatabaseName);
-            _projects = database.GetCollection<Project>("Projects");
+            _projects = projects;
         }
+
 
         public async Task<List<Project>> GetProjectsAsync(string userId)
         {
